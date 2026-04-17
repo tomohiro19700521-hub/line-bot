@@ -20,7 +20,7 @@ app.post("/webhook", async (req, res) => {
         },
         {
           headers: {
-            Authorization: `Bearer YOUR_OPENAI_API_KEY`,
+            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
           },
         }
       );
@@ -36,7 +36,7 @@ app.post("/webhook", async (req, res) => {
         },
         {
           headers: {
-            Authorization: `Bearer YOUR_LINE_CHANNEL_ACCESS_TOKEN`,
+           Authorization: `Bearer ${process.env.LINE_CHANNEL_ACCESS_TOKEN}`,
             "Content-Type": "application/json",
           },
         }
