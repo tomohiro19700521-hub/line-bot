@@ -27,13 +27,15 @@ app.post("/webhook", async (req, res) => {
 
       const reply = response.data.choices[0].message.content;
 
-      // LINEに返す
-      await axios.post(
-        "https://api.line.me/v2/bot/message/reply",
-        {
-          replyToken: event.replyToken,
-          messages: [{ type: "text", text: reply }],
-        },
+   // Googleスプレッドシートに保存
+await axios.post(process.env.GOOGLE_SCRIPT_URL, {
+  userId: event.source.userId || event.source.groupId || "",
+  report: userMessage,
+  analysis: reply
+});
+
+// LINEには返信しない
+console.log("日報を保存しました");
         {
           headers: {
            Authorization: `Bearer ${process.env.LINE_CHANNEL_ACCESS_TOKEN}`,
