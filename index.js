@@ -39,3 +39,6 @@ console.log("日報を保存しました");
 app.listen(3000, () => {
   console.log("Server running on port 3000");
 });
+}
+res.sendStatus(200);
+});
