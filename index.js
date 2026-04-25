@@ -36,18 +36,6 @@ await axios.post(process.env.GOOGLE_SCRIPT_URL, {
 
 // LINEには返信しない
 console.log("日報を保存しました");
-        {
-          headers: {
-           Authorization: `Bearer ${process.env.LINE_CHANNEL_ACCESS_TOKEN}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
-  }
-
-  res.sendStatus(200);
-});
 
 app.listen(3000, () => {
   console.log("Server running on port 3000");
