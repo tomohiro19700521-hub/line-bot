@@ -33,7 +33,6 @@ await axios.post(process.env.GOOGLE_SCRIPT_URL, {
   report: userMessage,
   analysis: reply
 });
-
 // LINEには返信しない
 console.log("日報を保存しました");
 
