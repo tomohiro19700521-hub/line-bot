@@ -5,40 +5,52 @@ const app = express();
 app.use(express.json());
 
 app.post("/webhook", async (req, res) => {
-  const events = req.body.events;
+  try {
+    const events = req.body.events || [];
 
-  for (let event of events) {
-    if (event.type === "message") {
+    for (const event of events) {
+      if (event.type !== "message") continue;
+      if (!event.message || event.message.type !== "text") continue;
+
       const userMessage = event.message.text;
 
-      // ChatGPTに送る
       const response = await axios.post(
         "https://api.openai.com/v1/chat/completions",
         {
           model: "gpt-4o-mini",
-          messages: [{ role: "user", content: userMessage }],
+          messages: [
+            {
+              role: "user",
+              content: userMessage,
+            },
+          ],
         },
         {
           headers: {
             Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+            "Content-Type": "application/json",
           },
         }
       );
 
       const reply = response.data.choices[0].message.content;
 
-   // Googleスプレッドシートに保存
-await axios.post(process.env.GOOGLE_SCRIPT_URL, {
-  userId: event.source.userId || event.source.groupId || "",
-  report: userMessage,
-  analysis: reply
+      await axios.post(process.env.GOOGLE_SCRIPT_URL, {
+        userId: event.source.userId || event.source.groupId || "",
+        report: userMessage,
+        analysis: reply,
+      });
+
+      console.log("日報を保存しました");
+    }
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.error("エラー:", error.response?.data || error.message);
+    res.sendStatus(200);
+  }
 });
-// LINEには返信しない
-console.log("日報を保存しました");
 
 app.listen(3000, () => {
   console.log("Server running on port 3000");
-});
-}
-res.sendStatus(200);
 });
