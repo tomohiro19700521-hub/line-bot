@@ -9,18 +9,16 @@ app.post("/webhook", async (req, res) => {
     const events = req.body.events || [];
 
     for (const event of events) {
-      console.log("EVENT:", JSON.stringify(event, null, 2));
 
       if (event.type !== "message") continue;
       if (!event.message || event.message.type !== "text") continue;
 
       const userMessage = event.message.text;
-      const groupId = event.source.groupId || "";
 
       // =========================
-      // 日報グループ
+      // 日報処理
       // =========================
-      if (groupId === "Cc2d7bc9e2e15c3e748d69af23ecddf8e") {
+      if (userMessage.startsWith("日報")) {
 
         const response = await axios.post(
           "https://api.openai.com/v1/chat/completions",
@@ -50,9 +48,9 @@ app.post("/webhook", async (req, res) => {
       }
 
       // =========================
-      // 売上グループ
+      // 売上処理
       // =========================
-      if (groupId === "C4313b02ab8a8a9e3f84f5e219105739e") {
+      else if (userMessage.startsWith("売上")) {
 
         await axios.post(process.env.GOOGLE_SCRIPT_URL_SALES, {
           userId: event.source.userId || "",
@@ -60,6 +58,13 @@ app.post("/webhook", async (req, res) => {
         });
 
         console.log("売上保存OK");
+      }
+
+      // =========================
+      // その他（無視）
+      // =========================
+      else {
+        console.log("対象外メッセージ:", userMessage);
       }
     }
 
